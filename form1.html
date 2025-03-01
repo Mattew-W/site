@@ -1,0 +1,32 @@
+<html>
+<head>
+    <title>我的表单</title>
+    <style>
+        table { border-collapse: collapse; } 
+        td { padding: 5px; } 
+    </style>
+</head>
+<body>
+    <h1>表单</h1>
+ <form action="#" method="post">  <!--  action="#" 表示提交到当前页面，method="post"  表单提交方法 -->
+        <table border="0">  <!--  border="0" 使表格边框不可见 -->
+            <tr>
+                <td><label for="name">姓名:</label></td>
+                <td><input type="text" id="name" name="name"></td>
+            </tr>
+            <tr>
+                <td><label for="email">邮箱:</label></td>
+                <td><input type="email" id="email" name="email"></td>
+            </tr>
+            <tr>
+                <td><label for="message">留言:</label></td>
+                <td><textarea id="message" name="message"></textarea></td>
+            </tr>
+            <tr>
+                <td></td>  <!--  空单元格，用于对齐按钮 -->
+                <td><input type="submit" value="提交"> <input type="reset" value="重置"></td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>
