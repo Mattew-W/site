@@ -1,32 +1,128 @@
 <html>
 <head>
-    <title>我的表单</title>
+    <title>用户注册</title>
     <style>
-        table { border-collapse: collapse; } 
-        td { padding: 5px; } 
+        body { font-family: Arial, sans-serif; }
+        .container { width: 400px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; }
+        h2 { text-align: center; }
+        .form-group { margin-bottom: 10px; display: flex; 
+                      align-items: baseline; 
+        }
+        .form-group label {
+            display: inline-block;
+            width: 100px; 
+            margin-right: 10px;
+            text-align: right;
+        }
+        .form-group-content { 
+            flex-grow: 1; 
+        }
+        input[type="text"], input[type="password"], input[type="email"], select, textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+        }
+        input[type="radio"], input[type="checkbox"] { margin-right: 5px; }
+        .radio-group label, .checkbox-group label { display: inline-block; margin-right: 15px; }
+        .select-file-button {
+            padding: 8px 15px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            display: inline-block;
+            text-align: center;
+        }
+        .file-input-container {
+            display: flex;
+            align-items: center;
+        }
+        .file-input-container input[type="file"] {
+            display: none;
+        }
+        .file-name {
+            margin-left: 10px;
+        }
+        .button-group { 
+            text-align: center; 
+            margin-top: 20px;
+        }
+        .fake-button { 
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;    
+            margin: 0 10px
+            text-align: center;
+        }
+         .fake-button:hover { 
+            background-color: #e0e0e0;
+        }
     </style>
 </head>
 <body>
-    <h1>表单</h1>
- <form action="#" method="post">  <!--  action="#" 表示提交到当前页面，method="post"  表单提交方法 -->
-        <table border="0">  <!--  border="0" 使表格边框不可见 -->
-            <tr>
-                <td><label for="name">姓名:</label></td>
-                <td><input type="text" id="name" name="name"></td>
-            </tr>
-            <tr>
-                <td><label for="email">邮箱:</label></td>
-                <td><input type="email" id="email" name="email"></td>
-            </tr>
-            <tr>
-                <td><label for="message">留言:</label></td>
-                <td><textarea id="message" name="message"></textarea></td>
-            </tr>
-            <tr>
-                <td></td>  <!--  空单元格，用于对齐按钮 -->
-                <td><input type="submit" value="提交"> <input type="reset" value="重置"></td>
-            </tr>
-        </table>
-    </form>
+    <div class="container">
+        <h2>用户注册</h2>
+        <form>
+            <div class="form-group">
+                <label for="username">用户名:</label>
+                <div class="form-group-content"><input type="text" id="username" name="username"></div>
+            </div>
+            <div class="form-group">
+                <label for="password">用户密码:</label>
+                <div class="form-group-content"><input type="password" id="password" name="password"></div>
+            </div>
+            <div class="form-group">
+                <label>用户性别:</label>
+                <div class="form-group-content radio-group">
+                    <label><input type="radio" name="gender" value="male" checked>男</label>
+                    <label><input type="radio" name="gender" value="female">女</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>爱好:</label>
+                <div class="form-group-content checkbox-group">
+                    <label><input type="checkbox" name="hobby" value="football">足球</label>
+                    <label><input type="checkbox" name="hobby" value="basketball">篮球</label>
+                    <label><input type="checkbox" name="hobby" value="lol">LOL</label>
+                    <label><input type="checkbox" name="hobby" value="koreandrama">韩剧</label>
+                    <label><input type="checkbox" name="hobby" value="honorofkings">王者荣耀</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="email">邮箱:</label>
+                <div class="form-group-content"><input type="email" id="email" name="email" placeholder="请输入您的邮箱"></div>
+            </div>
+             <div class="form-group">
+                <label>用户头像:</label>
+                <div class="form-group-content file-input-container">
+                    <label for="profile-image" class="select-file-button">选择文件</label>
+                    <input type="file" id="profile-image" name="profile-image">
+                    <span class="file-name">未选择文件</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="address">您的家庭住址是:</label>
+                <div class="form-group-content">
+                    <select id="address" name="address">
+                        <option value="">请选择</option>
+                        <option value="beijing">北京</option>
+                        <option value="shanghai">上海</option>
+                        <option value="guangzhou">广州</option>
+                        <option value="chengdu">成都</option>
+                        <option value="xian">西安</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="suggestions">您的建议或者意见:</label>
+                <div class="form-group-content"><textarea id="suggestions" name="suggestions" rows="4"></textarea></div>
+            </div>
+            <div class="button-group">
+                <div class="fake-button">提交</div>
+                <div class="fake-button">重置</div>
+            </div>
+        </form>
+    </div>
 </body>
 </html>
