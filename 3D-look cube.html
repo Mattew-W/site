@@ -1,0 +1,47 @@
+
+<html>
+<head>
+  <title>3D Box with Skew</title>
+  <style>
+    #a {
+      position: absolute;
+      width: 200px;
+      height: 100px;
+      background-color: red;
+      top: 0;
+      left: 100px;
+          transform-origin: bottom left;
+      transform: skewX(-30deg);
+    }
+
+
+    #b {
+      position: absolute;
+      width: 200px;
+      height: 100px;
+      background-color: yellow;
+      top: 100px;
+      left: 100px;
+    }
+
+
+    #c {
+      position: absolute;
+      width: 60px;
+      height: 100px;
+      background-color: green;
+      top: 100px;
+      left: 300px;
+      transform-origin: top left;
+      transform: skewY(-60deg);
+
+          }
+  </style>
+</head>
+<body>
+    <div id="a"></div>
+    <div id="b"></div>
+    <div id="c"></div>
+  </div>
+</body>
+</html>
