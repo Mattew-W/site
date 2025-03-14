@@ -24,9 +24,29 @@
         .basic-info-table th { width: 20%; text-align: left; font-weight: normal; } 
         .basic-info-table td { width: 30%; } 
         .work-experience-list { list-style-type: disc; margin-left: 20px; } 
-    </style>
+.ellipse {
+      width: 300px;           /* 椭圆宽度 */
+      height: 150px;          /* 椭圆高度 */
+      margin: 0 auto 20px auto; /* 居中并与下方内容保持间距 */
+      border-radius: 50%;     /* 创建椭圆形状 */
+      background: radial-gradient(circle, #ff7e5f, #feb47b); /* 初始径向渐变 */
+      animation: gradientAnimation 5s infinite; /* 应用动画 */
+    }
+
+    /* 定义动画 */
+    @keyframes gradientAnimation {
+      0% {
+        background: radial-gradient(circle, #ff7e5f, #feb47b);
+      }
+      50% {
+        background: radial-gradient(circle, #feb47b, #ff7e5f);
+      }
+      100% {
+        background: radial-gradient(circle, #ff7e5f, #feb47b);
+      }    </style>
 </head>
 <body>
+<div class="ellipse"></div>
     <div class="container">
         <table>
             <tr>
