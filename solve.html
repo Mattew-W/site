@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>求解二次方程</title>
+</head>
+<body>
+    <script>
+        // 获取用户输入的二次方程系数 a, b, c
+        let a = parseFloat(prompt("请输入系数 a:"));
+        let b = parseFloat(prompt("请输入系数 b:"));
+        let c = parseFloat(prompt("请输入系数 c:"));
+
+        // 输入验证
+        if (isNaN(a) || isNaN(b) || isNaN(c)) {
+            alert("请输入有效的数字作为系数！");
+        } else {
+            if (a === 0) {
+                if (b === 0) {
+                    if (c === 0) {
+                        alert("方程恒成立，有无数个解。");
+                        console.log("方程恒成立，有无数个解。");
+                    } else {
+                        alert("方程无解。");
+                        console.log("方程无解。");
+                    }
+                } else {
+                    let x = -c / b;
+                    alert("方程是线性方程，根为 x = " + x);
+                    console.log("方程是线性方程，根为 x = " + x);
+                }
+            } else {
+                // 计算判别式 delta = b² - 4ac
+                let delta = b * b - 4 * a * c;
+
+                if (delta < 0) {
+                    alert("方程没有实数根。");
+                    console.log("方程没有实数根。");
+                } else if (delta === 0) {
+                    let x = -b / (2 * a);
+                    alert("方程有一个实数根 (重根) x = " + x);
+                    console.log("方程有一个实数根 (重根) x = " + x);
+                } else {
+                    // 使用二次方程公式计算根 x1 和 x2
+                    let x1 = (-b + Math.sqrt(delta)) / (2 * a);
+                    let x2 = (-b - Math.sqrt(delta)) / (2 * a);
+
+                    // 通过弹窗显示结果
+                    alert("方程的根为 x1 = " + x1 + " 和 x2 = " + x2);
+                    console.log("方程的根为 x1 = " + x1 + " 和 x2 = " + x2);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
