@@ -1,8 +1,46 @@
 <html>
 <head>
-    <title>我的第一个网页</title>
+<title>Balloons</title>
+<style>
+body { margin: 0; overflow: hidden; }
+
+@keyframes fly {
+    0% { top: 400px; width: 100px; height: 100px; border-radius: 50px; background-color: red; }
+    50% { width: 120px; height: 120px; background-color: blue; }
+    100% { top: 0px; width: 80px; height: 80px; background-color: green; }
+}
+
+.balloon {
+    position: absolute;
+    left: 20px;
+    top: 400px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: red;
+    animation: fly 5s linear infinite;
+}
+</style>
 </head>
 <body>
-    <h1>my first page</h1>
+
+<script>
+function makeBalloon(color, startLeft) {
+    let b = document.createElement('div');
+    b.className = 'balloon';
+    b.style.left = startLeft + 'px';
+    b.style.backgroundColor = color;
+    document.body.appendChild(b);
+}
+
+const colors = ['red', 'blue', 'yellow', 'green', 'purple', 'orange'];
+
+for (let i = 0; i < 10; i++) {
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    const randomLeft = Math.random() * window.innerWidth;
+    makeBalloon(randomColor, randomLeft);
+}
+</script>
+
 </body>
 </html>
