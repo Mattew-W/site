@@ -1,55 +1,163 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <title>求解二次方程</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab62 - 一元二次方程求解器</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+        /* 让输入框和旁边的文字在同一行显示 */
+        .equation-input span,
+        .equation-input input,
+        .equation-input button {
+            display: inline-block; /* 或者使用 flexbox/grid */
+            vertical-align: middle; /* 垂直居中对齐 */
+            margin: 0 2px; /* 微调间距 */
+        }
+        .equation-input input {
+            width: 50px; /* 输入框宽度 */
+            padding: 5px;
+            border: 1px solid #aaa; /* 边框颜色与图片匹配 */
+            text-align: right;
+        }
+        .solution-area {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            min-height: 50px;
+            background-color: #f9f9f9;
+            font-family: monospace;
+        }
+        button {
+            padding: 5px 10px; /* 调整按钮内边距 */
+            cursor: pointer;
+            border: 1px solid #aaa;
+            background-color: #eee; /* 按钮背景色 */
+        }
+        h2 {
+            margin-top: 20px;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+            font-weight: normal; /* 移除加粗，更像图片 */
+        }
+         /* 隐藏用于无障碍访问的 label */
+         label {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+    </style>
 </head>
 <body>
-    <script>
-        // 获取用户输入的二次方程系数 a, b, c
-        let a = parseFloat(prompt("请输入系数 a:"));
-        let b = parseFloat(prompt("请输入系数 b:"));
-        let c = parseFloat(prompt("请输入系数 c:"));
 
-        // 输入验证
-        if (isNaN(a) || isNaN(b) || isNaN(c)) {
-            alert("请输入有效的数字作为系数！");
-        } else {
-            if (a === 0) {
-                if (b === 0) {
-                    if (c === 0) {
-                        alert("方程恒成立，有无数个解。");
-                        console.log("方程恒成立，有无数个解。");
+    <!-- <h1>一元二次方程求解器 (ax² + bx + c = 0)</h1> -->
+    <!-- <h1>可以移除，因为图片上没有主标题 -->
+
+    <!-- 对应图片中的输入行 -->
+    <div class="equation-input">
+        <label for="coeffA">系数 a:</label>
+        <input type="text" id="coeffA" value=""> <span>x² +</span>
+        <label for="coeffB">系数 b:</label>
+        <input type="text" id="coeffB" value=""> <span>x +</span>
+        <label for="coeffC">系数 c:</label>
+        <input type="text" id="coeffC" value=""> <span>= 0</span>
+        <button id="solveButton">解决</button> <!-- 按钮文字修改为“解决” -->
+    </div>
+
+    <!-- 对应图片中的“解决方案区域” -->
+    <h2>解决方案区域</h2>
+    <div id="solutionArea" class="solution-area">
+        <!-- 初始内容可以为空，或者保留提示 -->
+        请输入系数并点击“解决”。
+    </div>
+
+    <script>
+        // --- 获取页面元素 (与之前代码相同) ---
+        const inputA = document.getElementById('coeffA');
+        const inputB = document.getElementById('coeffB');
+        const inputC = document.getElementById('coeffC');
+        const solveButton = document.getElementById('solveButton');
+        const solutionArea = document.getElementById('solutionArea');
+
+        // --- 给按钮添加点击事件监听器 (与之前代码相同) ---
+        solveButton.addEventListener('click', solveQuadratic);
+
+        // --- 求解方程的函数 (与之前代码相同) ---
+        function solveQuadratic() {
+            const a = parseFloat(inputA.value);
+            const b = parseFloat(inputB.value);
+            const c = parseFloat(inputC.value);
+            let solutionText = "";
+
+            if (isNaN(a) || isNaN(b) || isNaN(c)) {
+                solutionText = "错误：请输入有效的数字作为系数！";
+            } else {
+                if (a === 0) {
+                    if (b === 0) {
+                        solutionText = (c === 0) ? "方程有无数解 (0 = 0)" : `方程无解 (${c} = 0)`;
                     } else {
-                        alert("方程无解。");
-                        console.log("方程无解。");
+                        let x = -c / b;
+                        solutionText = "线性方程解: x = " + formatNumber(x);
                     }
                 } else {
-                    let x = -c / b;
-                    alert("方程是线性方程，根为 x = " + x);
-                    console.log("方程是线性方程，根为 x = " + x);
-                }
-            } else {
-                // 计算判别式 delta = b² - 4ac
-                let delta = b * b - 4 * a * c;
-
-                if (delta < 0) {
-                    alert("方程没有实数根。");
-                    console.log("方程没有实数根。");
-                } else if (delta === 0) {
-                    let x = -b / (2 * a);
-                    alert("方程有一个实数根 (重根) x = " + x);
-                    console.log("方程有一个实数根 (重根) x = " + x);
-                } else {
-                    // 使用二次方程公式计算根 x1 和 x2
-                    let x1 = (-b + Math.sqrt(delta)) / (2 * a);
-                    let x2 = (-b - Math.sqrt(delta)) / (2 * a);
-
-                    // 通过弹窗显示结果
-                    alert("方程的根为 x1 = " + x1 + " 和 x2 = " + x2);
-                    console.log("方程的根为 x1 = " + x1 + " 和 x2 = " + x2);
+                    const delta = b * b - 4 * a * c;
+                    if (delta > 0) {
+                        const x1 = (-b + Math.sqrt(delta)) / (2 * a);
+                        const x2 = (-b - Math.sqrt(delta)) / (2 * a);
+                        solutionText = "x1 = " + formatNumber(x1) + ", x2 = " + formatNumber(x2);
+                    } else if (delta === 0) {
+                        let x = -b / (2 * a);
+                        const formattedX = (x === -0) ? 0 : x;
+                        solutionText = "x = " + formatNumber(formattedX);
+                    } else { // delta < 0
+                        const realPart = -b / (2 * a);
+                        const imagPart = Math.sqrt(-delta) / (2 * a);
+                        const formattedRealPart = (realPart === -0) ? 0 : realPart;
+                        // 直接使用图片中的示例格式
+                        solutionText = "x1=" + formatNumber(formattedRealPart) + "+" + formatNumber(imagPart) + "i, x2=" + formatNumber(formattedRealPart) + "-" + formatNumber(imagPart) + "i";
+                    }
                 }
             }
+            // 更新解决方案区域的内容
+            solutionArea.textContent = solutionText || "无解"; // 如果 solutionText 为空（理论上不会，但作为保险），显示“无解”
+             // 或者根据c===0且a=b=0的情况，输出 "无数解"
+             if (a===0 && b===0 && c===0) {
+                 solutionArea.textContent = "无数解";
+             } else if (a===0 && b===0 && c!==0) {
+                 solutionArea.textContent = "无解";
+             } else if (!solutionText && !(a===0 && b===0)) { // 捕获其他可能导致空结果的情况
+                 solutionArea.textContent = "请检查输入";
+             }
         }
+
+        // 辅助函数：格式化数字 (与之前代码相同)
+        function formatNumber(num, decimalPlaces = 4) {
+             if (Math.abs(num - Math.round(num)) < 1e-9) {
+                 return Math.round(num);
+             }
+             return parseFloat(num.toFixed(decimalPlaces));
+        }
+
+        // 可选：回车键触发求解 (与之前代码相同)
+        [inputA, inputB, inputC].forEach(input => {
+            input.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    solveButton.click();
+                }
+            });
+        });
+
     </script>
+
 </body>
 </html>
