@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>气球项目 - 少量</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden; /* 隐藏滚动条，因为气球可能会超出屏幕 */
+      background-color: #f0f0f0; /* 设置一个浅色背景 */
+    }
+
+    /* 定义气球的CSS动画 */
+    /* 根据笔记中的 @keyframes fly 补全，实现气球从底部上升并逐渐消失 */
+    @keyframes fly {
+      0% {
+        /* 动画开始状态：Y轴方向无位移，不缩放，完全可见 */
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        /* 动画结束状态：Y轴方向向上位移105%视口高度（确保移出屏幕），缩小到50%，完全透明 */
+        transform: translateY(-105vh) scale(0.5);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<script>
+  // --- 气球对象构造函数 ---
+  // 增加了 id 参数，以便于管理和获取单个气球的DOM元素
+  function Ballon(id, color, diameter, speed) {
+      this.id = id; // 气球对应的DOM元素的唯一ID
+      this.color = color; // 气球颜色 (e.g., 'red', '#ff0000')
+      this.diameter = diameter; // 气球直径 (像素)
+      this.speed = speed; // 用于计算动画持续时间 (速度值越高，持续时间越短，上升越快)
+
+      // 方法：创建气球的DOM元素并添加到页面中
+      // 根据笔记中的 this.make 补全，增加了定位样式
+      this.make = function() {
+          let dv = document.createElement('div');
+          dv.id = this.id; // 设置元素的ID
+          // 设置元素的CSS样式
+          dv.style.cssText = `
+              width: ${this.diameter}px;
+              height: ${this.diameter}px;
+              border-radius: ${this.diameter / 2}px; /* 使div变成圆形 */
+              background-color: ${this.color};
+              position: absolute; /* 设置绝对定位，方便控制位置 */
+              left: ${Math.random() * 100}vw; /* 随机水平起始位置 (0% to 100% 视口宽度) */
+              bottom: ${-this.diameter}px; /* 随机垂直起始位置，从视口下方开始 */
+              /* transform: translateY(0);  初始 transform 状态由 @keyframes 的 0% 处理 */
+          `;
+          document.body.appendChild(dv); // 将气球元素添加到body中
+      }
+
+      // 方法：给气球元素应用上升动画
+      // 根据笔记中的 this.rise 补全
+      this.rise = function() {
+          let dv = document.getElementById(this.id);
+          if (dv) { // 确保DOM元素存在
+              dv.style.animationName = 'fly'; // 设置动画名称为上面定义的 'fly'
+              // 根据速度计算动画持续时间。笔记中使用 (700 / this.speed) 秒。
+              // 速度值越大，持续时间 (700/speed) 越短，气球上升越快。
+              const animationDuration = (700 / this.speed); // 持续时间（秒）
+              dv.style.animationDuration = animationDuration + 's';
+              dv.style.animationTimingFunction = 'linear'; // 匀速动画
+              dv.style.animationFillMode = 'forwards'; // 动画结束后保持最后一帧的状态 (即消失在顶部)
+
+              // 在动画结束后移除元素，释放内存
+              dv.addEventListener('animationend', () => {
+                  dv.remove();
+                  // console.log(`Removed balloon ${this.id}`); // 调试用
+              });
+          }
+      }
+  }
+
+  // --- 气球创建代码 ---
+  // 将数量设置为一个较小的值
+  const numBalloons = 1000; // 需要创建的气球数量 (修改为1000)
+  // 定义一些随机颜色供选择 (使用十六进制颜色码)
+  const colors = ['#ff0000', '#0000ff', '#00ff00', '#800080', '#ffa500', '#ffc0cb', '#00ffff', '#ff00ff', '#ffff00', '#32cd32'];
+  const minDiameter = 15; // 最小气球直径 (像素)
+  const maxDiameter = 50; // 最大气球直径 (像素)
+  // 定义动画持续时间范围（秒），然后反算出 Ballons 构造函数需要的 'speed' 值
+  const minDuration = 15; // 最慢的上升速度对应的持续时间 (秒)
+  const maxDuration = 60; // 最快的上升速度对应的持续时间 (秒)
+
+
+  console.log(`尝试创建 ${numBalloons} 个气球... 这应该不会导致显著的性能问题。`); // 更新提示信息
+
+  // 使用循环创建指定数量的气球
+  for (let i = 0; i < numBalloons; i++) {
+      // 生成一个唯一ID用于DOM元素
+      const balloonId = 'balloon-' + i;
+      // 随机选择一个颜色
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      // 随机生成一个直径
+      const randomDiameter = Math.round(Math.random() * (maxDiameter - minDiameter) + minDiameter);
+      // 随机生成一个动画持续时间
+      const randomDuration = Math.random() * (maxDuration - minDuration) + minDuration;
+      // 根据持续时间计算 Ballon 构造函数所需的 'speed' 值
+      // 持续时间 (duration) = 700 / speed  =>  speed = 700 / duration
+      const speedForConstructor = 700 / randomDuration;
+
+      // 创建一个新的 Ballon 对象实例
+      const balloon = new Ballon(balloonId, randomColor, randomDiameter, speedForConstructor);
+
+      // 调用 make 方法创建并添加DOM元素
+      balloon.make();
+
+      // 调用 rise 方法启动动画
+      balloon.rise();
+  }
+
+  console.log("气球创建循环已完成。"); // 更新提示信息
+
+</script>
+
+</body>
+</html>
