@@ -1,7 +1,8 @@
-<!DOCTYPE html>
+
+
 <html>
 <head>
-  <title>气球项目 - 测试</title>
+  <title>气球项目 - 修改版</title>
   <style>
     body {
       margin: 0;
@@ -9,14 +10,15 @@
       background-color: #f0f0f0;
     }
 
+    /* 修改动画：让气球上升并变大 */
     @keyframes fly {
       0% {
-        transform: translateY(0) scale(1);
+        transform: translateY(0) scale(1); /* 从原始大小开始 */
         opacity: 1;
       }
       100% {
-        transform: translateY(-105vh) scale(0.5);
-        opacity: 0;
+        transform: translateY(-105vh) scale(1.5); /* 上升到顶部上方并变大 */
+        opacity: 0.5; /* 稍微变透明，可选 */
       }
     }
   </style>
@@ -28,7 +30,7 @@
     constructor(id, color, diameter, speed) {
       this.id = id;
       this.color = color;
-      this.diameter = diameter;
+      this.initialDiameter = diameter; // 存储初始直径
       this.speed = speed;
     }
 
@@ -36,62 +38,87 @@
       let dv = document.createElement('div');
       dv.id = this.id;
       dv.style.cssText = `
-          width: ${this.diameter}px;
-          height: ${this.diameter}px;
-          border-radius: ${this.diameter / 2}px;
+          width: ${this.initialDiameter}px;
+          height: ${this.initialDiameter}px;
+          border-radius: ${this.initialDiameter / 2}px;
           background-color: ${this.color};
           position: absolute;
           left: ${Math.random() * 100}vw;
-          bottom: ${-this.diameter}px; /* 从视口下方开始 */
+          bottom: ${-this.initialDiameter}px; /* 从视口下方开始 */
+          transition: transform linear; /* 添加一个 transform 的 transition 便于后续控制或平滑 */
       `;
       document.body.appendChild(dv);
-      //console.log(`Created balloon ${this.id}`); // 调试：确认元素是否被创建和添加
+      //console.log(`Created balloon ${this.id}`);
     }
 
     rise() {
       let dv = document.getElementById(this.id);
       if (dv) {
+        // 应用 CSS 动画进行上升和变大
         dv.style.animationName = 'fly';
-        const animationDuration = (700 / this.speed);
+        const animationDuration = (700 / this.speed); // 使用速度计算持续时间
         dv.style.animationDuration = animationDuration + 's';
         dv.style.animationTimingFunction = 'linear';
-        dv.style.animationFillMode = 'forwards';
-        dv.addEventListener('animationend', () => {
-          dv.remove();
-          //console.log(`Removed balloon ${this.id}`); // 调试：确认元素是否被移除
-        });
-        //console.log(`Started animation for balloon ${this.id}`); // 调试：确认动画是否启动
+        dv.style.animationFillMode = 'forwards'; // 动画结束后保持最后状态
+        // 移除 animationend 监听器，改用 JS 定时检查位置移除
+        // dv.addEventListener('animationend', () => { dv.remove(); }); // 移除这行
+        //console.log(`Started animation for balloon ${this.id}`);
       } else {
-         //console.error(`Error: Element with ID ${this.id} not found for animation.`); // 调试：如果找不到元素会报错
+         console.error(`Error: Element with ID ${this.id} not found for animation.`);
       }
     }
   }
 
-  const numBalloons = 20; // 大幅减少数量以便测试
-  const colors = ['#ff0000', '#0000ff', '#00ff00', '#800080', '#ffa500', '#ffc0cb', '#00ffff', '#ff00ff', '#ffff00', '#32cd32'];
-  const minDiameter = 15;
-  const maxDiameter = 50;
-  const minDuration = 15;
-  const maxDuration = 60;
+  const numBalloons = 30; // 增加数量以便观察效果
+  // **修改：限制颜色为指定的列表**
+  const colors = ['red', 'orange', 'yellow', 'green', 'black', 'blue', 'purple'];
+  const minDiameter = 20; // 稍微调整大小范围
+  const maxDiameter = 60;
+  const minDuration = 10; // 稍微调整持续时间范围
+  const maxDuration = 40;
 
-  console.log(`尝试创建 ${numBalloons} 个气球...`);
+  // **新增：设定气球爆炸的高度阈值 (从顶部开始计算)**
+  const burstLevelFromTop = 150; // 例如，当气球顶部距离视口顶部小于 150px 时爆炸
 
+  console.log(`Attempting to create ${numBalloons} balloons...`);
+
+  // 创建并启动气球
   for (let i = 0; i < numBalloons; i++) {
     const balloonId = 'balloon-' + i;
-    // **修正：从数组中随机选择一个颜色**
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
     const randomDiameter = Math.round(Math.random() * (maxDiameter - minDiameter) + minDiameter);
     const randomDuration = Math.random() * (maxDuration - minDuration) + minDuration;
-    const speedForConstructor = 700 / randomDuration;
+    const speedForConstructor = 700 / randomDuration; // 速度与持续时间反比
 
     const balloon = new Ballon(balloonId, randomColor, randomDiameter, speedForConstructor);
 
-    // 直接创建和启动动画，不加延迟
     balloon.make();
     balloon.rise();
   }
 
-  console.log("气球创建循环已完成。");
+  console.log("Balloon creation loop finished.");
+
+  // **新增：定时检查气球位置并移除**
+  function checkBalloonsForBurst() {
+      const activeBalloons = document.querySelectorAll('[id^="balloon-"]'); // 获取所有当前存在的ID以"balloon-"开头的元素
+      if (activeBalloons.length === 0) {
+          console.log("All balloons have burst. Stopping check.");
+          clearInterval(burstCheckInterval); // 如果没有气球了，停止定时器
+          return;
+      }
+
+      activeBalloons.forEach(balloonElement => {
+          const rect = balloonElement.getBoundingClientRect();
+          // 检查气球的顶部位置是否达到爆炸阈值
+          if (rect.top < burstLevelFromTop) {
+              console.log(`Balloon ${balloonElement.id} reached burst level (${rect.top}px) and is bursting.`);
+              balloonElement.remove(); // 移除气球元素
+          }
+      });
+  }
+
+  // 每隔一段时间运行检查函数，例如每 100 毫秒
+  const burstCheckInterval = setInterval(checkBalloonsForBurst, 100);
 
 </script>
 
