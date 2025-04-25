@@ -1,0 +1,124 @@
+
+<html>
+<head>
+  <title>Sorted Names</title>
+  <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+      padding: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Name List</h1>
+
+  <!-- 假设这是 names.html 中的表格 -->
+  <table>
+    <thead>
+      <tr>
+        <th>Full Name</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>John Doe</td></tr>
+      <tr><td>Jane Smith</td></tr>
+      <tr><td>Peter Jones</td></tr>
+      <tr><td>Alice Williams</td></tr>
+      <tr><td>Bob Brown</td></tr>
+      <tr><td>Charlie Davis</td></tr>
+      <tr><td>David Garcia</td></tr>
+      <tr><td>Eva Rodriguez</td></tr>
+      <tr><td>Frank Wilson</td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    // 将排序逻辑放在一个函数里
+    let sortByName = function() { // 提示里写的是 sortbylastname，这里根据任务描述按 first name 改为 sortByName，如果实际需求是按姓（last name）排序，需要调整比较函数
+      // 1. 获取表格 (假设是页面中的第一个表格)
+      const table = document.getElementsByTagName('table')[0];
+      if (!table) {
+          console.error("Table not found!");
+          return;
+      }
+
+      const tbody = table.querySelector('tbody');
+      if (!tbody) {
+           console.error("Table body not found!");
+           return;
+      }
+
+      // 2. 提取数据
+      // 将表格行转换成一个数组，每个元素是 { row: originalRowElement, name: fullNameString, firstName: firstNameString, lastName: lastNameString }
+      const rows = Array.from(tbody.rows); // 获取所有的行（包括表头行，如果thead没有被单独处理的话，这里假设tbody里是数据行）
+
+      // Filter out header rows if they are in tbody and map to data objects
+      const rowData = rows.map(row => {
+          const cell = row.cells[0]; // 假设姓名在第一列
+          if (!cell) return null; // Skip if cell doesn't exist
+
+          const fullName = cell.innerText.trim();
+          const parts = fullName.split(' ');
+          // Simple split - assumes "FirstName LastName" format
+          const firstName = parts.length > 0 ? parts[0] : '';
+          const lastName = parts.length > 1 ? parts[parts.length - 1] : ''; // Last part is lastName
+
+          return {
+              originalRow: row,
+              fullName: fullName,
+              firstName: firstName,
+              lastName: lastName
+          };
+      }).filter(item => item !== null); // Remove null entries if any
+
+      // 3. 排序 (根据任务描述按 first name 排序)
+      // 如果要按 first name 排序：
+       rowData.sort((a, b) => {
+           // 使用 localeCompare 进行字符串比较，处理不同语言的排序规则
+           return a.firstName.localeCompare(b.firstName);
+       });
+
+       // 如果要按 last name 排序 (根据提示函数名 sortbylastname 可能的意图):
+       /*
+       rowData.sort((a, b) => {
+           return a.lastName.localeCompare(b.lastName);
+       });
+       */
+
+       // 如果要按 full name 排序:
+       /*
+       rowData.sort((a, b) => {
+           return a.fullName.localeCompare(b.fullName);
+       });
+       */
+
+
+      // 4. 清空表格体
+      // Remove all existing rows from tbody
+      while (tbody.firstChild) {
+          tbody.removeChild(tbody.firstChild);
+      }
+
+      // 5. 重新填充表格
+      // Append the sorted original rows back to the tbody
+      rowData.forEach(data => {
+          tbody.appendChild(data.originalRow);
+      });
+
+      console.log("Table sorted by first name.");
+    };
+
+    // 将排序函数绑定到页面加载完成事件
+    window.onload = sortByName;
+    // 注意：提示中的 onload = sortbylastname; let sortbylastname = function()...
+    // 这种写法 'let' 声明的变量在赋值给 window.onload 时，可能存在时序问题，
+    // 如果 sortbylastname 在 window.onload 赋值时还未完全初始化。
+    // 推荐直接将函数名赋值给 onload 或者使用匿名函数包裹。
+    // 这里我们直接将 sortByName 函数赋值给 window.onload。
+
+  </script>
+
+</body>
+</html>
