@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sheet Merger</title>
+<style>
+  body {
+    font-family: sans-serif;
+  }
+</style>
+</head>
+<body>
+
+<h1>Sheet Merger Tool</h1>
+<p>This web app helps merge student data from two sources:</p>
+<ul>
+  <li>An official student roster</li>
+  <li>Grades from a 3rd party system (e.g., Runestone)</li>
+</ul>
+<p>The challenge is matching students when names don't perfectly match.</p>
+
+<p><strong>Workflow:</strong></p>
+<ol>
+  <li>Paste or open the data in the text areas (CSV format).</li>
+  <li>Click "Parse" for each dataset.  This will create Sheet objects.</li>
+  <li>The app will attempt to match rows based on a key column (e.g., Student ID).</li>
+  <li>Mismatches will be identified for manual matching.</li>
+  <li>Users can select columns to merge from the 3rd party data into the roster.</li>
+  <li>Finally, the merged data can be downloaded.</li>
+</ol>
+
+<p><strong>Class: Sheet (conceptual)</strong></p>
+<p>The foundation of what the program will do, not the program itself.</p>
+<pre>
+  <code>
+  class Sheet {
+
+      constructor(fileorcontent){
+          this.content = null;
+          this.data2d = [];
+          this.heading = [];
+          this.numcols = 0;
+          this.numrecords = 0;
+          this.extra = [];
+          this.mergingColumns = [];
+          this.keycolumn = this.identifykey();
+      }
+
+      identifykey() {
+      }
+
+      parse() {
+      }
+
+      match() {
+      }
+  }
+  </code>
+</pre>
+
+
+</body>
+</html>
