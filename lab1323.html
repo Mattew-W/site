@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>显示CSV文件内容</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 1rem;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px; /* CSV table might be wider */
+            width: 100%;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .file-input-label {
+            cursor: pointer;
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.6rem 1rem;
+            border-radius: 0.375rem;
+            display: block;
+            text-align: center;
+            transition: background-color 0.2s;
+            margin-bottom: 1rem;
+        }
+        .file-input-label:hover {
+            background-color: #2563eb;
+        }
+        input[type="file"].hidden-input {
+            opacity: 0;
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+        }
+        #csvContentContainer {
+            margin-top: 1rem;
+            overflow-x: auto; /* Allow table to scroll horizontally */
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            background-color: #f9fafb;
+        }
+        #csvContentContainer p.italic {
+             color: #6b7280;
+             padding: 1rem;
+             text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            /* margin-top: 1rem; No need, container has padding */
+        }
+        th, td {
+            border: 1px solid #d1d5db;
+            padding: 0.75rem; /* Increased padding */
+            text-align: left;
+            white-space: nowrap; /* Prevent cell content from wrapping */
+        }
+        th {
+            background-color: #e5e7eb; /* Light gray header background */
+            font-weight: 600; /* Header font bold */
+            color: #374151; /* Header font color */
+            position: sticky; /* Make header sticky */
+            top: 0; /* Stick to the top of the scrollable container */
+            z-index: 10;
+        }
+        td {
+            background-color: #ffffff; /* White cell background for better contrast with container */
+            color: #1f2937; /* Cell font color */
+        }
+        /* Add rounded corners to the first/last th/td of rows for a cleaner look if table is inside a rounded container */
+        table tr:first-child th:first-child { border-top-left-radius: 0.375rem; }
+        table tr:first-child th:last-child { border-top-right-radius: 0.375rem; }
+        /* No bottom radius for header if content scrolls */
+        /* table tr:last-child td:first-child { border-bottom-left-radius: 0.375rem; } */
+        /* table tr:last-child td:last-child { border-bottom-right-radius: 0.375rem; } */
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>3. 显示本地CSV文件内容</h2>
+        <label for="csvFile" class="file-input-label">选择CSV文件</label>
+        <input type="file" id="csvFile" accept=".csv,text/csv" class="hidden-input">
+        <div id="csvContentContainer">
+             <p class="italic">CSV内容将在此处以表格形式显示...</p>
+        </div>
+    </div>
+
+    <script>
+        // --- 3. Display Local CSV File Content ---
+        const csvFileInput = document.getElementById('csvFile');
+        const csvContentContainer = document.getElementById('csvContentContainer');
+
+        csvFileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const csvText = e.target.result;
+                    try {
+                        const table = parseCSVToTable(csvText);
+                        csvContentContainer.innerHTML = ''; // Clear placeholder or previous content
+                        csvContentContainer.appendChild(table);
+                    } catch (error) {
+                        console.error("Error parsing CSV:", error);
+                        csvContentContainer.innerHTML = '<p class="text-red-500 text-center p-4">解析CSV文件时出错。请确保文件格式有效。</p>';
+                    }
+                }
+                reader.onerror = function(e) {
+                    console.error("File could not be read!", e);
+                    csvContentContainer.innerHTML = '<p class="text-red-500 text-center p-4">读取CSV文件时出错。</p>';
+                }
+                reader.readAsText(file); // Reads the file as plain text
+            } else {
+                 csvContentContainer.innerHTML = '<p class="italic text-center p-4">未选择CSV文件或文件已被移除。</p>';
+            }
+            // IMPORTANT: Reset the file input's value
+            event.target.value = null;
+        });
+
+        /**
+         * Parses CSV text into an HTML table element.
+         * @param {string} csvText - The CSV data as a string.
+         * @returns {HTMLElement} The generated HTML table or a paragraph with a message.
+         */
+        function parseCSVToTable(csvText) {
+            const lines = csvText.trim().split(/\r\n|\n/); // Handles Windows and Unix line endings
+
+            if (lines.length === 0 || (lines.length === 1 && lines[0].trim() === '')) {
+                const p = document.createElement('p');
+                p.textContent = 'CSV 文件为空。';
+                p.classList.add('italic', 'text-center', 'p-4');
+                return p;
+            }
+
+            const table = document.createElement('table');
+            // Tailwind classes for table are mostly in <style>
+
+            // Create table header
+            const thead = table.createTHead();
+            const headerRowElement = thead.insertRow();
+            const headers = parseCsvRow(lines[0]); // Use robust parser for header row
+            headers.forEach(headerText => {
+                const th = document.createElement('th');
+                th.textContent = headerText.trim();
+                headerRowElement.appendChild(th);
+            });
+
+            // Create table body
+            const tbody = table.createTBody();
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].trim() === '') continue; // Skip empty lines
+                const rowData = parseCsvRow(lines[i]); // Use robust parser for data rows
+                const rowElement = tbody.insertRow();
+                // Ensure row has same number of cells as header, pad if necessary
+                for (let j = 0; j < headers.length; j++) {
+                    const cell = rowElement.insertCell();
+                    cell.textContent = (rowData[j] || "").trim(); // Use empty string if data is missing
+                }
+            }
+            return table;
+        }
+
+        /**
+         * Parses a single CSV row, handling quoted fields (including commas and escaped quotes).
+         * @param {string} rowString - The CSV row string.
+         * @returns {string[]} An array of field values.
+         */
+        function parseCsvRow(rowString) {
+            const fields = [];
+            let currentField = '';
+            let inQuotes = false;
+            for (let i = 0; i < rowString.length; i++) {
+                const char = rowString[i];
+                if (char === '"') {
+                    if (inQuotes && i + 1 < rowString.length && rowString[i+1] === '"') {
+                        // Handle escaped double quote ""
+                        currentField += '"';
+                        i++; // Skip the next quote
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    fields.push(currentField);
+                    currentField = '';
+                } else {
+                    currentField += char;
+                }
+            }
+            fields.push(currentField); // Add the last field
+            return fields;
+        }
+    </script>
+</body>
+</html>
