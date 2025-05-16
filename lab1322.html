@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>显示HTML文件内容</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* 顶部对齐，因为内容可能较长 */
+            min-height: 100vh;
+            padding: 1rem;
+            margin: 0;
+        }
+        .container {
+            max-width: 700px;
+            width: 100%;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .file-input-label {
+            cursor: pointer;
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.6rem 1rem;
+            border-radius: 0.375rem;
+            display: block;
+            text-align: center;
+            transition: background-color 0.2s;
+            margin-bottom: 1rem;
+        }
+        .file-input-label:hover {
+            background-color: #2563eb;
+        }
+        input[type="file"].hidden-input {
+            opacity: 0;
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+        }
+        #htmlContentContainer {
+            margin-top: 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            background-color: #f9fafb;
+            min-height: 150px;
+            overflow-y: auto; /* 如果内容过多则显示滚动条 */
+        }
+        #htmlContent { /* Style for the div where HTML content is injected */
+             white-space: normal; /* Allow HTML content to wrap as it normally would */
+             word-break: break-all; /* Prevent long strings from breaking the layout */
+        }
+        #htmlContentContainer p.italic { /* Style for the initial placeholder text */
+            color: #6b7280; /* Gray text */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>2. 显示本地HTML文件内容</h2>
+        <label for="htmlFile" class="file-input-label">选择HTML文件</label>
+        <input type="file" id="htmlFile" accept=".html,.htm" class="hidden-input">
+        <div id="htmlContentContainer">
+            <p class="italic">HTML内容将显示在此处...</p>
+        </div>
+    </div>
+
+    <script>
+        // --- 2. Display Local HTML File Content ---
+        const htmlFileInput = document.getElementById('htmlFile');
+        const htmlContentContainer = document.getElementById('htmlContentContainer');
+
+        htmlFileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Create a new div to hold the HTML content
+                    const contentDiv = document.createElement('div');
+                    contentDiv.id = 'htmlContent'; // Assign an ID for styling if needed
+                    // Sanitize HTML content before injecting to prevent XSS if the source is untrusted.
+                    // For this example, we assume the HTML file is trusted.
+                    // For untrusted content, consider using DOMPurify or similar libraries.
+                    contentDiv.innerHTML = e.target.result; // Set the innerHTML to the file's content
+
+                    // Clear previous content and append the new div
+                    htmlContentContainer.innerHTML = ''; // Clear placeholder or previous content
+                    htmlContentContainer.appendChild(contentDiv);
+                }
+                reader.onerror = function(e) {
+                    console.error("File could not be read!", e);
+                    htmlContentContainer.innerHTML = '<p class="text-red-500">读取HTML文件时出错。</p>';
+                }
+                reader.readAsText(file); // Reads the file as plain text
+            } else {
+                htmlContentContainer.innerHTML = '<p class="italic">未选择HTML文件或文件已被移除。</p>';
+            }
+            // IMPORTANT: Reset the file input's value
+            event.target.value = null;
+        });
+    </script>
+</body>
+</html>
