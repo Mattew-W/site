@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报告点击坐标</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+            margin: 0;
+        }
+        .container {
+            max-width: 500px;
+            width: 100%;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center; /* Center inner elements */
+        }
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1.5rem; /* Increased spacing */
+        }
+        #clickableElement {
+            width: 100%; /* Full width of container */
+            max-width: 400px; /* Max width to prevent it from being too wide */
+            height: 250px; /* Increased height */
+            background-color: #60a5fa; /* Light blue */
+            border: 3px dashed #1d4ed8; /* Darker and thicker blue dashed border */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600; /* Bolder font */
+            font-size: 1.1rem; /* Slightly larger font */
+            cursor: crosshair;
+            border-radius: 0.5rem; /* More rounded corners */
+            margin-left: auto;
+            margin-right: auto;
+            padding: 1rem; /* Inner padding */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow */
+            user-select: none; /* Prevent text selection on click */
+        }
+        #coordinatesOutput {
+            margin-top: 1.5rem; /* Increased spacing */
+            font-weight: 500;
+            color: #1f2937;
+            font-size: 1rem; /* Coordinate text size */
+            padding: 0.75rem 1rem; /* Increased padding */
+            background-color: #e9ecef; /* Lighter gray background for output */
+            border-radius: 0.375rem;
+            display: inline-block; /* Make background fit content width */
+            min-width: 250px; /* Minimum width for better layout */
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.075); /* Inner shadow */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>4. 报告点击坐标</h2>
+        <div id="clickableElement">
+            在此蓝色框内任意位置点击！
+        </div>
+        <p id="coordinatesOutput">坐标: (尚未点击)</p>
+    </div>
+
+    <script>
+        // --- 4. Report Click Coordinates ---
+        const clickableElement = document.getElementById('clickableElement');
+        const coordinatesOutput = document.getElementById('coordinatesOutput');
+
+        clickableElement.addEventListener('click', function(event) {
+            // Get coordinates relative to the element itself
+            const rect = clickableElement.getBoundingClientRect();
+            const xElement = event.clientX - rect.left;
+            const yElement = event.clientY - rect.top;
+
+            // Get coordinates relative to the viewport/window
+            const xViewport = event.clientX;
+            const yViewport = event.clientY;
+
+            // Get coordinates relative to the whole document (including scrolled out parts)
+            const xPage = event.pageX;
+            const yPage = event.pageY;
+
+            // Display coordinates relative to the element
+            coordinatesOutput.textContent = `相对于元素: (X: ${xElement.toFixed(1)}, Y: ${yElement.toFixed(1)})`;
+            
+            // You can also display other coordinate types if needed:
+            // coordinatesOutput.innerHTML = `
+            //     元素内: (X: ${xElement.toFixed(1)}, Y: ${yElement.toFixed(1)})<br>
+            //     视口内: (X: ${xViewport}, Y: ${yViewport})<br>
+            //     页面内: (X: ${xPage}, Y: ${yPage})
+            // `;
+            // Using toFixed(1) for slightly less precision but cleaner output.
+        });
+    </script>
+</body>
+</html>
