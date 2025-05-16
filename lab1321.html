@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>显示本地图片</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* 浅灰色背景 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+            margin: 0;
+        }
+        .container {
+            max-width: 500px;
+            width: 100%;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937; /* 深灰色文本 */
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .file-input-label {
+            cursor: pointer;
+            background-color: #3b82f6; /* 蓝色 */
+            color: white;
+            padding: 0.6rem 1rem;
+            border-radius: 0.375rem;
+            display: block; /* 改为块级元素使其占据整行 */
+            text-align: center; /* 文本居中 */
+            transition: background-color 0.2s;
+            margin-bottom: 1rem; /* 与下方图片预览的间距 */
+        }
+        .file-input-label:hover {
+            background-color: #2563eb; /* 深蓝色 */
+        }
+        /* Hide the actual file input, style the label instead */
+        input[type="file"].hidden-input {
+            opacity: 0;
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+        }
+        img#imagePreview { /* More specific selector */
+            margin-top: 1rem;
+            border: 1px solid #d1d5db; /* 灰色边框 */
+            border-radius: 0.375rem;
+            padding: 0.5rem;
+            background-color: #f9fafb; /* 非常浅的灰色背景 */
+            display: block; /* 确保图片是块级元素以便应用 margin auto */
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>1. 显示本地图片</h2>
+        <label for="imageFile" class="file-input-label">选择图片文件</label>
+        <input type="file" id="imageFile" accept="image/*" class="hidden-input">
+        <img id="imagePreview" src="#" alt="图片预览" style="display:none;"
+             onerror="this.style.display='block'; this.alt='图片加载失败'; this.src='https://placehold.co/300x200/e0e0e0/757575?text=图片加载失败';">
+    </div>
+
+    <script>
+        // --- 1. Display Local Image ---
+        const imageFileInput = document.getElementById('imageFile');
+        const imagePreview = document.getElementById('imagePreview');
+
+        // Function to show a placeholder if image fails or not selected
+        function _showPlaceholderImage(imgElement, text) {
+            const placeholderSrc = `https://placehold.co/300x200/e0e0e0/757575?text=${encodeURIComponent(text)}`;
+            if (imgElement) {
+                imgElement.src = placeholderSrc;
+                imgElement.alt = text;
+                imgElement.style.display = 'block';
+            }
+        }
+        // Initial placeholder
+        _showPlaceholderImage(imagePreview, '图片预览');
+
+        imageFileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block'; // Show the image element
+                    imagePreview.alt = file.name; // Set alt text to the file name
+                }
+                reader.onerror = function(e) {
+                    console.error("File could not be read!", e);
+                    _showPlaceholderImage(imagePreview, '加载图片出错');
+                }
+                reader.readAsDataURL(file); // Reads the file as a data URL (base64 encoded string)
+            } else {
+                _showPlaceholderImage(imagePreview, '未选择图片');
+            }
+            // IMPORTANT: Reset the file input's value
+            // This allows the 'change' event to be triggered even if the same file is selected again
+            event.target.value = null;
+        });
+    </script>
+</body>
+</html>
